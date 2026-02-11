@@ -34,7 +34,10 @@ partial class MainForm
         _grpReader = new GroupBox();
         _tlpReader = new TableLayoutPanel();
         _lblReaderName = new Label();
-        _txtReaderName = new TextBox();
+        _cboReader = new ComboBox();
+        _lblNewReader = new Label();
+        _txtNewReaderName = new TextBox();
+        _btnAddReader = new Button();
         _lblEnergy = new Label();
         _lblEnergyValue = new Label();
         _lblBooksRead = new Label();
@@ -209,44 +212,74 @@ partial class MainForm
         _grpReader.Dock = DockStyle.Fill;
         _grpReader.Name = "_grpReader";
         _grpReader.Padding = new Padding(8);
-        _grpReader.Size = new Size(348, 110);
+        _grpReader.Size = new Size(348, 140);
         _grpReader.TabIndex = 0;
         _grpReader.TabStop = false;
         _grpReader.Text = "Reader";
 
         // _tlpReader
         _tlpReader.AutoSize = true;
-        _tlpReader.ColumnCount = 2;
+        _tlpReader.ColumnCount = 3;
         _tlpReader.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         _tlpReader.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-        _tlpReader.RowCount = 3;
+        _tlpReader.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        _tlpReader.RowCount = 4;
+        _tlpReader.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         _tlpReader.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         _tlpReader.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         _tlpReader.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         _tlpReader.Controls.Add(_lblReaderName, 0, 0);
-        _tlpReader.Controls.Add(_txtReaderName, 1, 0);
-        _tlpReader.Controls.Add(_lblEnergy, 0, 1);
-        _tlpReader.Controls.Add(_lblEnergyValue, 1, 1);
-        _tlpReader.Controls.Add(_lblBooksRead, 0, 2);
-        _tlpReader.Controls.Add(_lblBooksReadValue, 1, 2);
+        _tlpReader.Controls.Add(_cboReader, 1, 0);
+        _tlpReader.SetColumnSpan(_cboReader, 2);
+        _tlpReader.Controls.Add(_lblNewReader, 0, 1);
+        _tlpReader.Controls.Add(_txtNewReaderName, 1, 1);
+        _tlpReader.Controls.Add(_btnAddReader, 2, 1);
+        _tlpReader.Controls.Add(_lblEnergy, 0, 2);
+        _tlpReader.Controls.Add(_lblEnergyValue, 1, 2);
+        _tlpReader.Controls.Add(_lblBooksRead, 0, 3);
+        _tlpReader.Controls.Add(_lblBooksReadValue, 1, 3);
         _tlpReader.Dock = DockStyle.Fill;
         _tlpReader.Location = new Point(8, 24);
-        _tlpReader.Size = new Size(332, 78);
+        _tlpReader.Size = new Size(332, 110);
         _tlpReader.Name = "_tlpReader";
 
         // _lblReaderName
         _lblReaderName.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         _lblReaderName.AutoSize = true;
         _lblReaderName.Name = "_lblReaderName";
-        _lblReaderName.Size = new Size(42, 15);
-        _lblReaderName.Text = "Name:";
+        _lblReaderName.Size = new Size(48, 15);
+        _lblReaderName.Text = "Reader:";
 
-        // _txtReaderName
-        _txtReaderName.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-        _txtReaderName.Name = "_txtReaderName";
-        _txtReaderName.Size = new Size(284, 23);
-        _txtReaderName.Text = "Alice";
-        _txtReaderName.Margin = new Padding(3);
+        // _cboReader
+        _cboReader.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+        _cboReader.DropDownStyle = ComboBoxStyle.DropDownList;
+        _cboReader.Name = "_cboReader";
+        _cboReader.Size = new Size(240, 23);
+        _cboReader.Margin = new Padding(3);
+        _cboReader.AccessibleName = "Select reader";
+        _cboReader.SelectedIndexChanged += CboReader_SelectedIndexChanged;
+
+        // _lblNewReader
+        _lblNewReader.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+        _lblNewReader.AutoSize = true;
+        _lblNewReader.Name = "_lblNewReader";
+        _lblNewReader.Size = new Size(48, 15);
+        _lblNewReader.Text = "New:";
+
+        // _txtNewReaderName
+        _txtNewReaderName.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+        _txtNewReaderName.Name = "_txtNewReaderName";
+        _txtNewReaderName.Size = new Size(200, 23);
+        _txtNewReaderName.Margin = new Padding(3);
+
+        // _btnAddReader
+        _btnAddReader.AutoSize = true;
+        _btnAddReader.Name = "_btnAddReader";
+        _btnAddReader.Size = new Size(80, 25);
+        _btnAddReader.Text = "Add";
+        _btnAddReader.Margin = new Padding(3);
+        _btnAddReader.Click += BtnAddReader_Click;
+        _btnAddReader.AccessibleName = "Add new reader";
 
         // _lblEnergy
         _lblEnergy.Anchor = AnchorStyles.Left | AnchorStyles.Right;
@@ -433,7 +466,10 @@ partial class MainForm
     private GroupBox _grpReader;
     private TableLayoutPanel _tlpReader;
     private Label _lblReaderName;
-    private TextBox _txtReaderName;
+    private ComboBox _cboReader;
+    private Label _lblNewReader;
+    private TextBox _txtNewReaderName;
+    private Button _btnAddReader;
     private Label _lblEnergy;
     private Label _lblEnergyValue;
     private Label _lblBooksRead;

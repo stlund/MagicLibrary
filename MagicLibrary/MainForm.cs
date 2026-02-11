@@ -6,8 +6,9 @@ namespace MagicLibrary;
 internal partial class MainForm : Form
 {
     private readonly Library _library;
-    private readonly Reader _reader;
+    private readonly List<Reader> _readers = [];
     private readonly List<Book> _borrowedBooks = [];
+    private Reader _currentReader;
 
     public MainForm()
     {
@@ -18,14 +19,44 @@ internal partial class MainForm : Form
         _library.AddBook(new Book { Title = "To Kill a Mockingbird", Pages = 281 });
         _library.AddBook(new Book { Title = "1984", Pages = 328 });
 
-        _reader = new Reader { Name = "Alice", Energy = 100 };
+        AddReader(new Reader { Name = "Alice", Energy = 100 });
+        AddReader(new Reader { Name = "Bob", Energy = 200 });
 
-        _txtReaderName.Text = _reader.Name;
-        _txtReaderName.TextChanged += TxtReaderName_TextChanged;
+        _currentReader = _readers[0];
+        _cboReader.SelectedIndex = 0;
 
         RefreshBookList();
         RefreshReaderStats();
         Log("Welcome to the Magic Library!");
+    }
+
+    private void CboReader_SelectedIndexChanged(object? sender, EventArgs e)
+    {
+        if (_cboReader.SelectedIndex < 0 || _cboReader.SelectedIndex >= _readers.Count)
+        {
+            return;
+        }
+
+        _currentReader = _readers[_cboReader.SelectedIndex];
+        RefreshReaderStats();
+        Log($"Switched to reader: {_currentReader.Name}.");
+    }
+
+    private void BtnAddReader_Click(object? sender, EventArgs e)
+    {
+        string name = _txtNewReaderName.Text.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            MessageBox.Show("Please enter a name for the new reader.", "Missing Name", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        Reader reader = new Reader { Name = name, Energy = 200 };
+        AddReader(reader);
+        _cboReader.SelectedIndex = _cboReader.Items.Count - 1;
+        _txtNewReaderName.Clear();
+
+        Log($"Added new reader: {name}.");
     }
 
     private void BtnAddBook_Click(object? sender, EventArgs e)
@@ -60,7 +91,7 @@ internal partial class MainForm : Form
         _borrowedBooks.Add(book);
 
         RefreshBookList();
-        Log($"{_reader.Name} borrowed '{book.Title}'.");
+        Log($"{_currentReader.Name} borrowed '{book.Title}'.");
     }
 
     private void BtnReturn_Click(object? sender, EventArgs e)
@@ -71,7 +102,6 @@ internal partial class MainForm : Form
             return;
         }
 
-        // Let the user pick which borrowed book to return
         string[] titles = _borrowedBooks.Select(b => b.Title).ToArray();
         using SelectBookDialog dialog = new("Select a book to return:", titles);
 
@@ -89,10 +119,10 @@ internal partial class MainForm : Form
         }
 
         _borrowedBooks.Remove(book);
-        _reader.ReturnBook(_library, book);
+        _currentReader.ReturnBook(_library, book);
 
         RefreshBookList();
-        Log($"{_reader.Name} returned '{book.Title}'.");
+        Log($"{_currentReader.Name} returned '{book.Title}'.");
     }
 
     private void BtnRead_Click(object? sender, EventArgs e)
@@ -104,32 +134,29 @@ internal partial class MainForm : Form
         }
 
         int requiredEnergy = book.Pages / 2;
-        if (_reader.Energy < requiredEnergy)
+        if (_currentReader.Energy < requiredEnergy)
         {
-            Log($"{_reader.Name} does not have enough energy to read '{book.Title}' (needs {requiredEnergy}, has {_reader.Energy}).");
+            Log($"{_currentReader.Name} does not have enough energy to read '{book.Title}' (needs {requiredEnergy}, has {_currentReader.Energy}).");
             return;
         }
 
-        int usedEnergy = _reader.ReadBook(book);
+        int usedEnergy = _currentReader.ReadBook(book);
         RefreshReaderStats();
-        Log($"{_reader.Name} read '{book.Title}' and used {usedEnergy} energy. Energy left: {_reader.Energy}.");
+        Log($"{_currentReader.Name} read '{book.Title}' and used {usedEnergy} energy. Energy left: {_currentReader.Energy}.");
     }
 
     private void BtnRest_Click(object? sender, EventArgs e)
     {
         int hours = (int)_nudRestHours.Value;
-        _reader.Rest(hours);
+        _currentReader.Rest(hours);
         RefreshReaderStats();
-        Log($"{_reader.Name} rested for {hours} hour(s) and regained {hours * 10} energy. Energy: {_reader.Energy}.");
+        Log($"{_currentReader.Name} rested for {hours} hour(s) and regained {hours * 10} energy. Energy: {_currentReader.Energy}.");
     }
 
-    private void TxtReaderName_TextChanged(object? sender, EventArgs e)
+    private void AddReader(Reader reader)
     {
-        string name = _txtReaderName.Text.Trim();
-        if (!string.IsNullOrWhiteSpace(name))
-        {
-            _reader.Name = name;
-        }
+        _readers.Add(reader);
+        _cboReader.Items.Add(reader.Name);
     }
 
     private Book? GetSelectedBook()
@@ -160,7 +187,7 @@ internal partial class MainForm : Form
 
     private void RefreshReaderStats()
     {
-        _lblEnergyValue.Text = _reader.Energy.ToString();
+        _lblEnergyValue.Text = _currentReader.Energy.ToString();
         _lblBooksReadValue.Text = LibraryService.totalBookRead.ToString();
     }
 
